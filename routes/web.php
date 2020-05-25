@@ -12,6 +12,7 @@
 */
 
 Route::resource('/', 'MainPageController', ['main'])->only(['index']);
+Route::resource('/links', 'LinksController', ['links']);
 Route::get('/horizon', function (){
     return redirect();
 });

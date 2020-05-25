@@ -16,6 +16,7 @@ class CreateLinksTable extends Migration
         Schema::create('links', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->text('link')->comment('Ссылка для парсинга');
+            $table->boolean('is_done')->default(0)->comment('Успешность завершения скачивания');
             $table->unsignedBigInteger('parent_id')->nullable(true)->comment('Ключ к родительской ссылке');
             $table->timestamps();
         });

@@ -96,7 +96,7 @@ class ProxyCheckerService
         $this->proxy->update([
             'type' => $this->proxyType,
             'status' => $this->responseHeaders
-                ? (($this->proxyType != 'CURLPROXY_SOCKS5' || $this->isPublic) ? 3 : 1)
+                ? (($this->proxyType != 'CURLPROXY_SOCKS5' || $this->isPublic) ? 3 : 2)
                 : 10,
         ]);
         return $this;

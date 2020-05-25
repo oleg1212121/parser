@@ -17,7 +17,8 @@ class CreateProxiesTable extends Migration
             $table->bigIncrements('id');
             $table->string('proxy')->comment('name:pass@ip:port / ip:port');
             $table->string('type')->nullable(true)->comment('Тип прокси');
-            $table->unsignedSmallInteger('status')->default(2)->comment('Надежность работы');
+            $table->smallInteger('fails')->default(0)->comment('Количество неудачных использований');
+            $table->unsignedSmallInteger('status')->default(3)->comment('Надежность работы');
             $table->timestamps();
         });
     }

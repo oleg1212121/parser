@@ -7,5 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Link extends Model
 {
     protected $table = 'links';
-    protected $fillable =  ['link', 'parent_id'];
+    protected $fillable =  ['link', 'parent_id', 'is_done'];
 }
