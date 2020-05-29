@@ -15,9 +15,10 @@ class CreateLinksTable extends Migration
     {
         Schema::create('links', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->text('link')->comment('Ссылка для парсинга');
+            $table->text('link',500)->comment('Ссылка для парсинга');
+            $table->unsignedTinyInteger('type')->default(0)->comment('Тип ссылки каталог/продукт');
             $table->boolean('is_done')->default(0)->comment('Успешность завершения скачивания');
-            $table->unsignedBigInteger('parent_id')->nullable(true)->comment('Ключ к родительской ссылке');
+            $table->unsignedBigInteger('order_id')->nullable(true)->comment('Ключ к заказу');
             $table->timestamps();
         });
     }

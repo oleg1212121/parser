@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Proxy extends Model
 {
     protected $table = 'proxies';
-    protected $fillable = ['proxy','type','status','fails'];
+    protected $fillable = ['proxy','type','status','fails','used'];
 
-    public static function getFreeProxy()
+    public static function scopeFreeProxy($query)
     {
-        return self::where('fails','<', 3)->orderBy('fails')->first();
+        return $query->where('fails','<', 3)->orderBy('fails');
     }
 
     public function scopeAbandoned($query)
@@ -22,6 +22,6 @@ class Proxy extends Model
 
     public function scopeForRestoring($query)
     {
-        return $query->where('fails', '>', 2)->whereDate('updated_at', '>', now()->addMinutes(-60)->format('Y-m-d H:m:s'));
+        return $query->where('fails', '>', 0)->where('updated_at', '<', now()->addMinutes(-60)->format('Y-m-d H:m:s'));
     }
 }

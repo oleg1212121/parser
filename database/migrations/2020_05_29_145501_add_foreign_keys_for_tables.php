@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddForeignKeys extends Migration
+class AddForeignKeysForTables extends Migration
 {
     /**
      * Run the migrations.
@@ -17,7 +17,7 @@ class AddForeignKeys extends Migration
             $table->foreign('link_id')->references('id')->on('links')->onDelete('set null');
         });
         Schema::table('links', function (Blueprint $table) {
-            $table->foreign('parent_id')->references('id')->on('links')->onDelete('set null');
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
         });
     }
 
@@ -29,8 +29,8 @@ class AddForeignKeys extends Migration
     public function down()
     {
         Schema::table('links', function (Blueprint $table) {
-            $table->dropForeign(['parent_id']);
-            $table->dropColumn(['parent_id']);
+            $table->dropForeign(['order_id']);
+            $table->dropColumn(['order_id']);
         });
         Schema::table('pages', function (Blueprint $table) {
             $table->dropForeign(['link_id']);

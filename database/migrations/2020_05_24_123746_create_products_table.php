@@ -15,11 +15,11 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->text('link')->comment('Ссылка на страницу продукта');
-            $table->text('title')->comment('Название продукта');
-            $table->string('price')->comment('Цена');
-            $table->string('rating')->comment('Рейтинг');
-            $table->string('review')->nullable()->comment('Отзывы');
+            $table->unsignedBigInteger('market_id')->comment('Идентификатор продукта в маркете');
+            $table->text('title', 500)->comment('Название продукта');
+            $table->text('content')->comment('Характеристики');
+            $table->text('link', 500)->comment('Ссылка на страницу продукта');
+            $table->text('image', 500)->comment('Ссылка на картинку продукта');
             $table->timestamps();
         });
     }

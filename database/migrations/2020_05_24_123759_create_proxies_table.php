@@ -15,9 +15,10 @@ class CreateProxiesTable extends Migration
     {
         Schema::create('proxies', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('proxy')->comment('name:pass@ip:port / ip:port');
+            $table->string('proxy')->unique()->comment('name:pass@ip:port / ip:port');
             $table->string('type')->nullable(true)->comment('Тип прокси');
             $table->smallInteger('fails')->default(0)->comment('Количество неудачных использований');
+            $table->smallInteger('used')->default(0)->comment('Количество использований');
             $table->unsignedSmallInteger('status')->default(3)->comment('Надежность работы');
             $table->timestamps();
         });

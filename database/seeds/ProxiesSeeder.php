@@ -11,207 +11,27 @@ class ProxiesSeeder extends Seeder
      */
     public function run()
     {
-        $proxies = [
-            [
-                'proxy' => 'cnctkloo-1:nd3bfe4cxtk4@45.94.47.66:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'proxy' => 'cnctkloo-2:nd3bfe4cxtk4@193.8.94.225:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'proxy' => 'cnctkloo-3:nd3bfe4cxtk4@45.94.47.108:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'proxy' => 'cnctkloo-4:nd3bfe4cxtk4@45.141.176.202:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'proxy' => 'cnctkloo-5:nd3bfe4cxtk4@193.8.56.119:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'proxy' => 'cnctkloo-6:nd3bfe4cxtk4@194.33.29.86:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'proxy' => 'cnctkloo-7:nd3bfe4cxtk4@85.209.130.129:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'proxy' => 'cnctkloo-8:nd3bfe4cxtk4@193.8.215.135:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'proxy' => 'cnctkloo-9:nd3bfe4cxtk4@193.27.23.190:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'proxy' => 'cnctkloo-10:nd3bfe4cxtk4@85.209.129.161:1080', // +
-                'status' => 1,
-                'type' => 'CURLPROXY_SOCKS5',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '96.44.183.149:55225'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '95.179.200.239:30963'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '51.81.31.171:61267'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '45.77.226.250:31844'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.48.233:4145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.48.228:4145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '173.245.239.177:16964'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.48.249:4145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '72.210.252.152:46154'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '208.102.51.6:58208'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '173.245.239.223:16938'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '72.49.49.11:31034'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '98.143.145.29:62354'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.48.232:4145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.48.246:4145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '98.162.25.29:31679'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.70.241.18:24404'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '66.110.216.221:39603'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '66.110.216.105:39431'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.70.241.7:24385'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '184.178.172.25:15291'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '208.97.31.229:53124'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '173.245.239.12:17145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.70.241.27:24413'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '184.178.172.5:15303'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '184.178.172.13:15311'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.35.7:36171'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.70.241.8:24398'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.48.235:4145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.35.29:36177'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '47.241.16.16:1080'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '184.178.172.18:15280'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.48.252:4145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '184.176.166.8:17864'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '216.144.228.130:15378'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '216.144.230.233:15993'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '72.210.252.134:46164'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '184.178.172.28:15294'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '98.143.145.30:62353'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.48.225:4145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.76.35.15:36163'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '66.135.227.178:4145'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '174.70.241.14:24392'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '24.249.199.14:57335'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '157.230.154.241:9050'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '72.221.164.35:60670'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '207.97.174.134:1080'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '96.44.133.110:58690'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '72.11.148.222:56533'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '212.3.156.107:30116'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '84.16.140.5:12351'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '185.8.157.204:26394'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '211.24.110.192:19438'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '74.199.74.88:10485'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '46.174.106.14:38434'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '89.189.177.121:20621'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '91.185.43.96:30988'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '95.84.202.75:35325'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '82.151.205.71:28557'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '185.61.253.146:42131'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '149.56.172.26:61228'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '98.143.146.246:25157'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '198.11.179.15:8080'],
-            ['created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(), 'status' => '3', 'type' => 'CURLPROXY_SOCKS5', 'proxy' => '92.222.180.156:1080'],
-        ];
-
-        \DB::table('proxies')->insert($proxies);
+        $data = file_get_contents(base_path().'/proxies.txt');
+        $proxies = [];
+        if($data){
+            $data = explode(PHP_EOL, $data);
+            foreach ($data as $k => $item) {
+                $i = explode('+++',$item);
+                $date = now();
+                if(count($i) > 1){
+                    array_push($proxies, [
+                        'proxy' => $i[0],
+                        'type' => $i[1],
+                        'status' => $i[2],
+                        'created_at' => $date,
+                        'updated_at' => $date,
+                    ]);
+                }
+                unset($item);
+            }
+            \DB::table('proxies')->insert($proxies);
+        }else{
+            $this->command->info('Файл со списком прокси не найден, либо произошла ошибка.');
+        }
     }
 }
