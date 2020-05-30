@@ -6,6 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Page extends Model
 {
-    protected $fillable = ['content', 'link_id'];
+    protected $fillable = ['content', 'link_id','type', 'is_done'];
     protected $table = 'pages';
 }

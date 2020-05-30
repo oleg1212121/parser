@@ -19,6 +19,7 @@ class CreateLinksTable extends Migration
             $table->unsignedTinyInteger('type')->default(0)->comment('Тип ссылки каталог/продукт');
             $table->boolean('is_done')->default(0)->comment('Успешность завершения скачивания');
             $table->unsignedBigInteger('order_id')->nullable(true)->comment('Ключ к заказу');
+            $table->timestamp('published_at')->nullable(true)->comment('Метка публикации (доступ к обработке)');
             $table->timestamps();
         });
     }

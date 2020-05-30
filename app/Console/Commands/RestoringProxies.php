@@ -2,25 +2,24 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\GetPage;
-use App\Models\Link;
+use App\Models\Proxy;
 use Illuminate\Console\Command;
 
-class GetCategoryPages extends Command
+class RestoringProxies extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'getPages:category';
+    protected $signature = 'restoring:proxies';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Get category pages from links';
+    protected $description = 'Restoring failed proxies';
 
     /**
      * Create a new command instance.
@@ -39,9 +38,8 @@ class GetCategoryPages extends Command
      */
     public function handle()
     {
-        $chunks = Link::сategoryLinksReadyToProcess()->limit(400)->get()->chunk(4);
-        foreach ($chunks as $chunk) {
-            GetPage::dispatch($chunk->values());
-        }
+        Proxy::forRestoring()->limit(500)->update([
+            'fails' => 0
+        ]);
     }
 }

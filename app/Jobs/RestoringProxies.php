@@ -27,7 +27,6 @@ class RestoringProxies implements ShouldQueue
      * Execute the job.
      * Порченные прокси у которых последняя дата обновления была более часа назад - восстанавливаются
      *
-     *
      * @return void
      */
     public function handle()

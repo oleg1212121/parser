@@ -179,12 +179,13 @@ class GetPage implements ShouldQueue
                 $status = curl_multi_exec($mh, $running);
             } while ($mh == CURLM_CALL_MULTI_PERFORM);
         }
-
+        $now = now();
         foreach ($curly as $id => $c) {
             $content = curl_multi_getcontent($c);
-            $now = now();
+
             array_push($this->pages, [
                 'content' => $content,
+                'type' => $this->links[$id]->type,
                 'link_id' => $this->links[$id]->id,
                 'created_at' => $now,
                 'updated_at' => $now,

@@ -39,7 +39,7 @@ class GetProductPages extends Command
      */
     public function handle()
     {
-        $chunks = Link::where('is_done', 0)->whereType(1)->limit(400)->get()->chunk(4);
+        $chunks = Link::productLinksReadyToProcess()->limit(400)->get()->chunk(4);
         foreach ($chunks as $chunk) {
             GetPage::dispatch($chunk->values());
         }

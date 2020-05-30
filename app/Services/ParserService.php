@@ -31,7 +31,7 @@ class ParserService
         $this->outputNextLink = $this->searchingNextButton($dom);
         $this->outputLinks = $this->searchingCardItemLinks($dom);
         \phpQuery::unloadDocuments();
-
+        $this->setCurrentPageIsDone();
         return $this;
 
     }
@@ -45,7 +45,7 @@ class ParserService
     protected function searchingCardItemLinks($dom)
     {
         $arr = [];
-        $d = $dom->find('.n-snippet-cell2 .n-snippet-cell2__header .n-snippet-cell2__title a');
+        $d = $dom->find('.i-bem.b-zone.b-spy-visible.b-spy-events h3 > a');
 
         foreach ($d as $item) {
             $i = pq($item)->attr('href');
@@ -57,6 +57,11 @@ class ParserService
         }
 
         return $arr;
+    }
+
+    protected function setCurrentPageIsDone()
+    {
+        $this->page->update(['is_done' => 1]);
     }
 
     protected function searchingCardItems($dom)

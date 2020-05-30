@@ -16,6 +16,8 @@ class CreatePagesTable extends Migration
         Schema::create('pages', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->longText('content')->comment('Контент скачанной страницы');
+            $table->unsignedTinyInteger('type')->default(0)->comment('Тип страницы');
+            $table->boolean('is_done')->default(0)->comment('Отметка об обработке текущей страницы');
             $table->unsignedBigInteger('link_id')->nullable(true)->comment('Ключ к ссылке');
             $table->timestamps();
         });
