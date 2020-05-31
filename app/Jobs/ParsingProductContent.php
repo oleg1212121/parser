@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Models\Link;
 use App\Models\Page;
+use App\Models\Product;
 use App\Services\ParserService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,16 +11,15 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class GenerateLinksFromCategory implements ShouldQueue
+class ParsingProductContent implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $page;
+    protected $page = null;
 
     /**
      * Create a new job instance.
      *
-     * @param Page $page
      * @return void
      */
     public function __construct(Page $page = null)
@@ -35,18 +34,11 @@ class GenerateLinksFromCategory implements ShouldQueue
      */
     public function handle()
     {
-        if($this->page){
-            $parser = (new ParserService($this->page))->parsingLinks();
-            \DB::transaction(function() use ($parser) {
-                $parser->setCurrentPageIsDone();
-                if($parser->outputNextLink){
-                    Link::create(['link' => $parser->outputNextLink]);
-                }
-                if($parser->outputLinks){
-                    foreach ($parser->outputLinks as $outputLink) {
-                        Link::create($outputLink);
-                    }
-                }
+        if ($this->page) {
+            $product = (new ParserService($this->page))->parsingProduct();
+            \DB::transaction(function () use ($product) {
+                Product::create($product->product);
+                $product->setCurrentPageIsDone();
             });
         }
     }

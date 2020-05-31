@@ -12,6 +12,7 @@ use App\Models\Proxy;
 
 class ProxyCheckerService
 {
+    // todo: переделать либо удалить (сейчас не используется)
     public static $PROXY_TYPES = [
         'CURLPROXY_HTTP_1_0' => CURLPROXY_HTTP_1_0,
         'CURLPROXY_HTTP' => CURLPROXY_HTTP,

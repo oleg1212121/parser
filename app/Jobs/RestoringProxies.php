@@ -31,6 +31,8 @@ class RestoringProxies implements ShouldQueue
      */
     public function handle()
     {
+        // todo: удалить job т.к. есть комманда
+
         Proxy::forRestoring()->limit(500)->update([
             'fails' => 0
         ]);

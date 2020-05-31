@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Jobs\GenerateLinksFromCategory;
 use App\Jobs\GetPage;
+use App\Jobs\ParsingProductContent;
 use App\Models\Link;
 use App\Models\Page;
 use Illuminate\Console\Command;
@@ -48,6 +49,8 @@ class SearchingUnprocessedInstances extends Command
             $categoryLinks = Link::categoryLinksReadyToProcess()->limit(400)->get();
             if (count($categoryLinks) > 0) {
                 $chunks = $categoryLinks->chunk(4);
+
+                $this->info('GET CATEGORY PAGES');
                 foreach ($chunks as $chunk) {
                     GetPage::dispatch($chunk->values());
                 }
@@ -55,23 +58,23 @@ class SearchingUnprocessedInstances extends Command
                 $productLinks = Link::productLinksReadyToProcess()->limit(400)->get();
                 if (count($productLinks) > 0) {
                     $chunks = $productLinks->chunk(4);
+                    $this->info('GET PRODUCTS LINKS');
                     foreach ($chunks as $chunk) {
                         GetPage::dispatch($chunk->values());
                     }
                 } else {
                     $categoryPages = Page::where('type', 0)->where('is_done', 0)->limit(20)->get();
                     if (count($categoryPages) > 0) {
+                        $this->info('GENERATE LINKS FROM CATEGORY');
                         foreach ($categoryPages as $page) {
                             GenerateLinksFromCategory::dispatch($page);
                         }
                     } else {
-                        $productPages = Page::where('type', 1)->where('is_done', 0)->limit(20)->get();
+                        $productPages = Page::where('type', 1)->where('is_done', 0)->limit(60)->get();
                         if (count($productPages) > 0) {
-                            $this->info('PAGES PRODUCT');
+                            $this->info('PAGES PRODUCTS');
                             foreach ($productPages as $page) {
-//                                GenerateLinksFromCategory::dispatch($chunk->values());
-//                                https://market.yandex.by/catalog--mobilnye-telefony-v-minske/54726/list?hid=91491&local-offers-first=0&onstock=1&lr=0&rtr=35&page=2
-//                                https://market.yandex.by/catalog--mobilnye-telefony-v-minske/54726/list?hid=91491&local-offers-first=0&onstock=1&lr=0&rtr=35&page=2
+                                ParsingProductContent::dispatch($page);
                             }
                         }
                     }
