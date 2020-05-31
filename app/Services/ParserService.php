@@ -12,13 +12,46 @@ use App\Models\Page;
 
 class ParserService
 {
+    /**
+     * Массив ссылок на продукты (парсится со страниц категорий)
+     * @var array
+     */
     public $outputLinks = [];
+
+    /**
+     * Ссылка на следующую страницу категории (по пагинации)
+     * @var null
+     */
     public $outputNextLink = null;
+
+    /**
+     * Массив данных для создания продукта в БД (парсится со страниц продукта)
+     * @var array
+     */
     public $product = [];
 
+    /**
+     * Страница для парсинга
+     * @var Page
+     */
     protected $page;
+
+    /**
+     * Url сайта
+     * @var string
+     */
     protected $domen = 'https://market.yandex.by';
+
+    /**
+     * Параметры для вкладки характеристик продукта
+     * @var string
+     */
     protected $endForSpecification = '/spec?track=tabs';
+
+    /**
+     * Параметры для вкладки описания продукта
+     * @var string
+     */
     protected $endForDescription = '?track=tabs';
 
     public function __construct(Page $page)
@@ -26,6 +59,10 @@ class ParserService
         $this->page = $page;
     }
 
+    /**
+     * Обработчик парсинга ссылок со страниц категорий
+     * @return $this
+     */
     public function parsingLinks()
     {
         $dom = \phpQuery::newDocument($this->page->content);
@@ -35,6 +72,10 @@ class ParserService
         return $this;
     }
 
+    /**
+     * Обработчик парсинга контента страницы продукта
+     * @return $this
+     */
     public function parsingProduct()
     {
         $dom = \phpQuery::newDocument($this->page->content);
@@ -43,13 +84,23 @@ class ParserService
         return $this;
     }
 
+    /**
+     * Метод поиска ссылки на следующую страницу категории
+     * @param $dom
+     * @return null|string
+     */
     protected function searchingNextButton($dom)
     {
         $link = $dom->find(".n-pager__button-next")->attr('href') ?? null;
         return $link ? $this->domen . $link : null;
     }
 
-    protected function searchingCardItemLinks($dom)
+    /**
+     * Метод поиска ссылок на товары со страницы категории
+     * @param $dom
+     * @return array
+     */
+    protected function searchingCardItemLinks($dom) :array
     {
         $arr = [];
         $d = $dom->find('.i-bem.b-zone.b-spy-visible.b-spy-events h3 > a');
@@ -68,20 +119,34 @@ class ParserService
         return $arr;
     }
 
-    protected function buildProductLink($url)
+    /**
+     * Метод обработки ссылок на продукт (и валидация от редиректа на товары других категорий)
+     * @param $url
+     * @return string
+     */
+    protected function buildProductLink($url) :string
     {
         $i = preg_replace('/\?.*/', '', $url);
         $redirect = preg_match('/\/redir\//', $i);
         return ($i && !$redirect) ? $this->domen . $i . $this->endForSpecification : '';
     }
 
+    /**
+     * Метод обновления состояния обработанной страницы до "завершен"
+     * @return $this
+     */
     public function setCurrentPageIsDone()
     {
         $this->page->update(['is_done' => 1]);
         return $this;
     }
 
-    protected function searchingProductContent($dom)
+    /**
+     * Обработчик контента страницы продукта
+     * @param $dom
+     * @return array
+     */
+    protected function searchingProductContent($dom) :array
     {
         $now = now();
         $content = [];
