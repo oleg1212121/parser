@@ -2,43 +2,18 @@
 
 namespace App\Jobs;
 
-use App\Models\Link;
+use App\Models\Image;
 use App\Models\Proxy;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Collection;
 
-class GetPage implements ShouldQueue
+class GetImage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 5;
-
-    /**
-     * Набор ссылок для запросов
-     * @var array|Collection
-     */
-    protected $links = [];
-
-    /**
-     * Массив успешно полученных ответов
-     * @var array
-     */
-    protected $pages = [];
-
-    /**
-     * Массив используемых прокси адресов
-     * @var array
-     */
-    protected $proxies = [];
-
-    /**
-     * Массив user-agent
-     * @var array
-     */
     protected $agents = [
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
@@ -129,16 +104,20 @@ class GetPage implements ShouldQueue
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.84 Safari/537.36',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.181 Safari/537.36',
-        ];
+    ];
 
+
+    protected $options = [];
+    protected $links = [];
+    protected $proxies;
 
     /**
      * Create a new job instance.
      *
-     * @param array|Collection $links
+     * @param array $links
      * @return void
      */
-    public function __construct( $links = [] )
+    public function __construct($links = [])
     {
         $this->links = $links;
     }
@@ -153,62 +132,53 @@ class GetPage implements ShouldQueue
         $this->proxies = Proxy::freeProxy()->limit(count($this->links))->get();
         $linksCount = count($this->links);
         $proxiesCount = count($this->proxies);
-        if( $linksCount > 0 && $proxiesCount > 0 && $linksCount <= $proxiesCount ){
+        if ($linksCount > 0 && $proxiesCount > 0 && $linksCount <= $proxiesCount) {
             $this->sendingRequests();
             $this->processingResponse();
-        }else{
+        } else {
             $this->fail(new \Exception('Not enough proxies.'));
         }
     }
 
     /**
-     * - Сохранение валидных страниц в базу
-     * - Инкремент счетчика ошибок прокси
-     * - Присвоеное статуса "выполнено" для успешно обработанных
+     * - Успешно сохраненный файл переводит images в состояние - завершен
      *
      * @return void
      */
     protected function processingResponse()
     {
         \DB::transaction(function (){
-            if (count($this->pages) > 0) {
-                \DB::table('pages')->insert($this->pages);
+            if(count($this->links)){
+                Image::whereIn('name', $this->links->pluck('name'))->update(['is_done' => 1]);
             }
             if (count($this->proxies) > 0) {
                 Proxy::whereIn('id', $this->proxies->pluck('id'))->increment('fails');
             }
-            if (count($this->links) > 0) {
-                Link::whereIn('id', $this->links->pluck('id'))->update(['is_done' => 1]);
-            }
         });
     }
 
-    /**
-     * - Создание набора дескрипторов для запросов
-     * - Запись ответов в массив pages
-     * - Проверка контента на валидность
-     *
-     * @return void
-     */
     protected function sendingRequests()
     {
+        $options = [
+            CURLOPT_TIMEOUT => 60,
+            CURLOPT_FOLLOWLOCATION => 1,
+            CURLOPT_RETURNTRANSFER => 1,
+//            CURLOPT_BUFFERSIZE => 1024,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_CONNECTTIMEOUT => 6,
+            CURLOPT_USERAGENT => $this->agents[array_rand($this->agents, 1)],
+        ];
+
         $curly = [];
         $mh = curl_multi_init();
 
         foreach ($this->links as $id => $url) {
             $curly[$id] = curl_init();
+            curl_setopt_array($curly[$id], $options);
             curl_setopt($curly[$id], CURLOPT_PROXY, $this->proxies[$id]->proxy); // ip прокси (имя:пароль@124.11.22.32:1028 / 124.65.12.55:8080)
             curl_setopt($curly[$id], CURLOPT_PROXYTYPE, constant($this->proxies[$id]->type ?? 'CURLPROXY_HTTP')); // type прокси socks5/4 , http , https
             curl_setopt($curly[$id], CURLOPT_URL, $url->link);
-            curl_setopt($curly[$id], CURLOPT_HEADER, false);
-            curl_setopt($curly[$id], CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($curly[$id], CURLOPT_TIMEOUT, 40);
-            curl_setopt($curly[$id], CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($curly[$id], CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($curly[$id], CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($curly[$id], CURLOPT_USERAGENT, $this->agents[array_rand($this->agents, 1)]);
-            curl_setopt($curly[$id], CURLOPT_CONNECTTIMEOUT, 6); // время установки соединения
-            curl_setopt($curly[$id], CURLOPT_NOBODY, false); // не показывать тело ответа
             curl_multi_add_handle($mh, $curly[$id]);
         }
 
@@ -226,30 +196,31 @@ class GetPage implements ShouldQueue
                 $status = curl_multi_exec($mh, $running);
             } while ($mh == CURLM_CALL_MULTI_PERFORM);
         }
-        $now = now();
+
         foreach ($curly as $id => $c) {
             $content = curl_multi_getcontent($c);
-
-            array_push($this->pages, [
-                'content' => $content,
-                'type' => $this->links[$id]->type,
-                'link_id' => $this->links[$id]->id,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]);
-
+            if ($content) {
+                $fi = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = (string)finfo_buffer($fi, $content);
+                finfo_close($fi);
+                if (strpos($mime, 'image') === false) {
+                    unset($this->links[$id]);
+                } else {
+                    $image = getimagesizefromstring($content);
+                    $extension = image_type_to_extension($image[2]);
+                    $format = str_replace('jpeg', 'jpg', $extension);
+                    $image_sv = storage_path() . '/app/public/images/' . md5($this->links[$id]);
+                    if (!file_put_contents($image_sv . $format, $content)) {
+                        unset($this->links[$id]);
+                    }
+                    unset($this->proxies[$id]);
+                }
+            } else {
+                echo $this->links[$id]->link.PHP_EOL;
+                unset($this->links[$id]);
+            }
             curl_multi_remove_handle($mh, $c);
         }
         curl_multi_close($mh);
-
-        foreach ($this->pages as $key => $page) {
-            if (!$page['content'] || strlen($page['content']) < 10000) {
-                unset($this->links[$key]);
-                unset($this->pages[$key]);
-            }else{
-                unset($this->proxies[$key]);
-            }
-        }
     }
-
 }

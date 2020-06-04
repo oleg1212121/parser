@@ -3,8 +3,11 @@
 namespace App\Console\Commands;
 
 use App\Jobs\GenerateLinksFromCategory;
+use App\Jobs\GetImage;
 use App\Jobs\GetPage;
 use App\Jobs\ParsingProductContent;
+use App\Jobs\ParsingProductImagesLinks;
+use App\Models\Image;
 use App\Models\Link;
 use App\Models\Page;
 use Illuminate\Console\Command;
@@ -42,44 +45,64 @@ class SearchingUnprocessedInstances extends Command
      */
     public function handle()
     {
+        $chunkSize = 10;
 
-        $firstJob = \DB::table('jobs')->first();
 
-        if(!$firstJob) {
-            $categoryLinks = Link::categoryLinksReadyToProcess()->limit(400)->get();
-            if (count($categoryLinks) > 0) {
-                $chunks = $categoryLinks->chunk(4);
+        $first = \DB::table('jobs')->where('queue', 'categoryLink')->first();
+        $second = \DB::table('jobs')->where('queue', 'categoryPage')->first();
+        $third = \DB::table('jobs')->where('queue', 'productLink')->first();
+        $fourth = \DB::table('jobs')->where('queue', 'productPage')->first();
+        $fifth = \DB::table('jobs')->where('queue', 'image')->first();
 
-                $this->info('GET CATEGORY PAGES');
-                foreach ($chunks as $chunk) {
-                    GetPage::dispatch($chunk->values());
+        if (!$first) {
+            $categoryLinks = Link::categoryLinksReadyToProcess()->limit(200)->get();
+            $chunks = $categoryLinks->chunk($chunkSize);
+            $this->info(count($chunks));
+            foreach ($chunks as $chunk) {
+                GetPage::dispatch($chunk->values())->onQueue('categoryLink');
+            }
+        }
+
+        if (!$second) {
+            $productLinks = Link::productLinksReadyToProcess()->limit(200)->get();
+            $chunks = $productLinks->chunk($chunkSize);
+            $this->info(count($chunks));
+            foreach ($chunks as $chunk) {
+                GetPage::dispatch($chunk->values())->onQueue('categoryPage');
+            }
+        }
+        if (!$third) {
+            $categoryPages = Page::categoryPagesReadyToProcess()->limit(30)->get();
+            foreach ($categoryPages as $page) {
+                GenerateLinksFromCategory::dispatch($page)->onQueue('productLink');
+            }
+            $this->info(count($categoryPages));
+        }
+        $productPages = [];
+        if (!$fourth) {
+            $productPages = Page::productPagesReadyToProcess()->limit(30)->get();
+            $this->info(count($productPages));
+            if (count($productPages) > 0) {
+                foreach ($productPages as $page) {
+                    ParsingProductContent::dispatch($page)->onQueue('productPage');
                 }
             } else {
-                $productLinks = Link::productLinksReadyToProcess()->limit(400)->get();
-                if (count($productLinks) > 0) {
-                    $chunks = $productLinks->chunk(4);
-                    $this->info('GET PRODUCTS LINKS');
-                    foreach ($chunks as $chunk) {
-                        GetPage::dispatch($chunk->values());
-                    }
-                } else {
-                    $categoryPages = Page::where('type', 0)->where('is_done', 0)->limit(20)->get();
-                    if (count($categoryPages) > 0) {
-                        $this->info('GENERATE LINKS FROM CATEGORY');
-                        foreach ($categoryPages as $page) {
-                            GenerateLinksFromCategory::dispatch($page);
-                        }
-                    } else {
-                        $productPages = Page::where('type', 1)->where('is_done', 0)->limit(60)->get();
-                        if (count($productPages) > 0) {
-                            $this->info('PAGES PRODUCTS');
-                            foreach ($productPages as $page) {
-                                ParsingProductContent::dispatch($page);
-                            }
-                        }
+                $productPages = Page::notDone()->where('type', Page::$PRODUCT_TYPE_DESCRIPTION)->limit(50)->get();
+
+                if (!$fifth) {
+                    foreach ($productPages as $page) {
+                        ParsingProductImagesLinks::dispatch($page)->onQueue('image');
                     }
                 }
             }
         }
+        if (!$first && !$second && !$third && !$fourth && !$fifth && count($productPages) == 0) {
+            $images = Image::where('is_done', 0)->limit(60)->get();
+            $chunks = $images->chunk($chunkSize);
+            foreach ($chunks as $chunk) {
+                GetImage::dispatch($chunk->values())->onQueue('default');
+            }
+        }
+
     }
 }

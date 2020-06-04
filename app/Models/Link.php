@@ -16,10 +16,16 @@ class Link extends Model
     public static $CATEGORY_TYPE = 0;
 
     /**
-     * Тип ссылки - продукт
+     * Тип ссылки - продукт - характеристики
      * @var int
      */
-    public static $PRODUCT_TYPE = 1;
+    public static $PRODUCT_TYPE_SPECIFICATION = 1;
+
+    /**
+     * Тип ссылки - продукт - описание
+     * @var int
+     */
+    public static $PRODUCT_TYPE_DESCRIPTION = 2;
 
     /**
      * @param $query
@@ -36,7 +42,7 @@ class Link extends Model
      */
     public function scopeProductLinksReadyToProcess($query)
     {
-        return $query->notDone()->whereType(self::$PRODUCT_TYPE);
+        return $query->notDone()->whereIn('type',[self::$PRODUCT_TYPE_SPECIFICATION,self::$PRODUCT_TYPE_DESCRIPTION]);
     }
 
     /**

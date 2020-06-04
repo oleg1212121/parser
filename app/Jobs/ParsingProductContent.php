@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Image;
 use App\Models\Page;
 use App\Models\Product;
 use App\Services\ParserService;
@@ -35,10 +36,20 @@ class ParsingProductContent implements ShouldQueue
     public function handle()
     {
         if ($this->page) {
-            $product = (new ParserService($this->page))->parsingProduct();
-            \DB::transaction(function () use ($product) {
-                Product::create($product->product);
-                $product->setCurrentPageIsDone();
+            $productData = (new ParserService($this->page))->parsingProductData();
+            \DB::transaction(function () use ($productData) {
+                Product::firstOrCreate(
+                    [
+                        'market_id' =>  $productData->product['market_id']
+                    ],
+                    [
+                        'title' =>  $productData->product['title'],
+                        'content' =>  $productData->product['content'],
+                        'link' =>  $productData->product['link'],
+                        'image' => 'gg'
+                    ]
+                );
+                $productData->setCurrentPageIsDone();
             });
         }
     }

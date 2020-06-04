@@ -19,7 +19,7 @@ class CreateProductsTable extends Migration
             $table->text('title', 500)->comment('Название продукта');
             $table->text('content')->comment('Характеристики');
             $table->text('link', 500)->comment('Ссылка на страницу продукта');
-            $table->text('image', 500)->comment('Ссылка на картинку продукта');
+//            $table->text('image', 500)->comment('Ссылка на картинку продукта');
             $table->timestamps();
         });
     }

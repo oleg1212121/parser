@@ -37,7 +37,7 @@ return [
         'database' => [
             'driver' => 'database',
             'table' => 'jobs',
-            'queue' => 'default',
+            'queue' => 'categoryLink,categoryPage,productLink,productPage,image,default',
             'retry_after' => 90,
         ],
 

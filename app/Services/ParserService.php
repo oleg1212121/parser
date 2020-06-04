@@ -13,6 +13,12 @@ use App\Models\Page;
 class ParserService
 {
     /**
+     * Идентификатор продукта в маркете
+     * @var null
+     */
+    public $productMarketId = null;
+
+    /**
      * Массив ссылок на продукты (парсится со страниц категорий)
      * @var array
      */
@@ -29,6 +35,12 @@ class ParserService
      * @var array
      */
     public $product = [];
+
+    /**
+     * Массив изображений относящихся к продукту (только ссылки)
+     * @var array
+     */
+    public $images = [];
 
     /**
      * Страница для парсинга
@@ -76,10 +88,19 @@ class ParserService
      * Обработчик парсинга контента страницы продукта
      * @return $this
      */
-    public function parsingProduct()
+    public function parsingProductData()
     {
         $dom = \phpQuery::newDocument($this->page->content);
         $this->product = $this->searchingProductContent($dom);
+        \phpQuery::unloadDocuments();
+        return $this;
+    }
+
+    public function parsingProductImagesLinks()
+    {
+        $dom = \phpQuery::newDocument($this->page->content);
+        $this->images = $this->searchingProductImages($dom);
+        $this->productMarketId = $this->getProductId();
         \phpQuery::unloadDocuments();
         return $this;
     }
@@ -107,11 +128,15 @@ class ParserService
 
         foreach ($d as $item) {
             $i = pq($item)->attr('href');
-            $link = $this->buildProductLink($i);
-            if($link){
+            $links = $this->buildProductLink($i);
+            if(count($links) > 0){
                 array_push($arr, [
-                    'link' => $link,
+                    'link' => $links[0],
                     'type' => 1,
+                ]);
+                array_push($arr, [
+                    'link' => $links[1],
+                    'type' => 2,
                 ]);
             }
         }
@@ -121,14 +146,17 @@ class ParserService
 
     /**
      * Метод обработки ссылок на продукт (и валидация от редиректа на товары других категорий)
+     * - возвращается массив [ссылка на характеристики, ссылка на описание]
      * @param $url
-     * @return string
+     * @return array
      */
-    protected function buildProductLink($url) :string
+    protected function buildProductLink($url) :array
     {
         $i = preg_replace('/\?.*/', '', $url);
         $redirect = preg_match('/\/redir\//', $i);
-        return ($i && !$redirect) ? $this->domen . $i . $this->endForSpecification : '';
+        return ($i && !$redirect)
+            ? [$this->domen . $i . $this->endForSpecification, $this->domen . $i . $this->endForDescription ]
+            : [];
     }
 
     /**
@@ -151,10 +179,9 @@ class ParserService
         $now = now();
         $content = [];
 
-        $image = 'https:' . $dom->find('._2hXkcuvR_J')->attr('src');
+
         $a = $dom->find('._27nuSZ19h7');
         $href = $a->attr('href');
-        $productLink = $this->buildProductLink($href);
         $id = preg_replace(['/\/.*\//', '/(\?|\/).*/'], '', $href);
         $title = $a->find("h1")->text();
         $spec = $dom->find("dl");
@@ -174,12 +201,39 @@ class ParserService
             'market_id' => $id,
             'title' => $title,
             'content' => json_encode($content),
-            'link' => $productLink,
-            'image' => $image,
+            'link' => $this->page->link_id,
+            'image' => 'gg',
             'created_at' => $now,
             'updated_at' => $now,
         ];
 
         return $arr;
+    }
+
+    /**
+     * @return null|string|string[]
+     */
+    public function getProductId()
+    {
+        $link = $this->page->link()->first()->link ?? null;
+
+        return preg_replace(['/.*\/.*\//', '/(\?|\/).*/'], '', $link);
+    }
+
+    protected function searchingProductImages($dom) :array
+    {
+        $images = [];
+        $divs = $dom->find('#ProductImageGallery > div');
+        foreach ($divs as $div) {
+            $i = pq($div);
+            $url = $i->contents()->eq(0)->attr('content');
+            if($url){
+                array_push($images, [
+                    'link' => $url,
+                    'name' => md5($url),
+                ]);
+            }
+        }
+        return $images;
     }
 }

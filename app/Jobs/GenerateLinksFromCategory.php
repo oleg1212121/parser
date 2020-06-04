@@ -38,7 +38,6 @@ class GenerateLinksFromCategory implements ShouldQueue
         if($this->page){
             $parser = (new ParserService($this->page))->parsingLinks();
             \DB::transaction(function() use ($parser) {
-                $parser->setCurrentPageIsDone();
                 if($parser->outputNextLink){
                     Link::create(['link' => $parser->outputNextLink]);
                 }
@@ -47,6 +46,7 @@ class GenerateLinksFromCategory implements ShouldQueue
                         Link::create($outputLink);
                     }
                 }
+                $parser->setCurrentPageIsDone();
             });
         }
     }

@@ -22,6 +22,6 @@ class Proxy extends Model
 
     public function scopeForRestoring($query)
     {
-        return $query->where('fails', '>', 0)->where('updated_at', '<', now()->addMinutes(-60)->format('Y-m-d H:m:s'));
+        return $query->where('fails', '>', 0)->where('updated_at', '<', now()->addMinutes(-120)->format('Y-m-d H:m:s'));
     }
 }
