@@ -13,4 +13,8 @@ class Product extends Model
     {
         return $this->belongsToMany(Image::class);
     }
+    public function links()
+    {
+        return $this->belongsTo(Link::class, 'link');
+    }
 }

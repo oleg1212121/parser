@@ -69,6 +69,7 @@ class ParserService
     public function __construct(Page $page)
     {
         $this->page = $page;
+        $this->domen = $this->getDomen($page->link->link);
     }
 
     /**
@@ -142,6 +143,21 @@ class ParserService
         }
 
         return $arr;
+    }
+
+    /**
+     * Получение домена по ссылке на текущую страницу
+     * @param $url
+     * @return null
+     */
+    public function getDomen($url)
+    {
+        if(preg_match('/^https?:\/\/[^\/]*(\/|$)/m', $url, $matches)){
+            $res = $matches[0];
+        }else{
+            $res = null;
+        }
+        return $res;
     }
 
     /**

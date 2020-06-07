@@ -72,7 +72,7 @@ class SearchingUnprocessedInstances extends Command
             }
         }
         if (!$third) {
-            $categoryPages = Page::categoryPagesReadyToProcess()->limit(30)->get();
+            $categoryPages = Page::categoryPagesReadyToProcess()->with('link')->limit(30)->get();
             foreach ($categoryPages as $page) {
                 GenerateLinksFromCategory::dispatch($page)->onQueue('productLink');
             }
@@ -80,14 +80,14 @@ class SearchingUnprocessedInstances extends Command
         }
         $productPages = [];
         if (!$fourth) {
-            $productPages = Page::productPagesReadyToProcess()->limit(30)->get();
+            $productPages = Page::productPagesReadyToProcess()->with('link')->limit(30)->get();
             $this->info(count($productPages));
             if (count($productPages) > 0) {
                 foreach ($productPages as $page) {
                     ParsingProductContent::dispatch($page)->onQueue('productPage');
                 }
             } else {
-                $productPages = Page::notDone()->where('type', Page::$PRODUCT_TYPE_DESCRIPTION)->limit(50)->get();
+                $productPages = Page::notDone()->where('type', Page::$PRODUCT_TYPE_DESCRIPTION)->with('link')->limit(50)->get();
 
                 if (!$fifth) {
                     foreach ($productPages as $page) {

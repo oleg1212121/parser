@@ -14,6 +14,14 @@ class GetImage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $headers = [
+            'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept-Language: ru-RU,ru-BY;q=0.9,ru;q=0.8,en-US;q=0.7,en;q=0.6',
+            'Content-Type: text/html; charset=utf-8',
+            'Cache-Control: no-cache',
+            'Connection: keep-alive',
+            'Referer: https://www.google.com/',
+    ];
     protected $agents = [
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36',
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.138 Safari/537.36',
@@ -163,12 +171,15 @@ class GetImage implements ShouldQueue
             CURLOPT_TIMEOUT => 60,
             CURLOPT_FOLLOWLOCATION => 1,
             CURLOPT_RETURNTRANSFER => 1,
-//            CURLOPT_BUFFERSIZE => 1024,
             CURLOPT_SSL_VERIFYPEER => 0,
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_CONNECTTIMEOUT => 6,
             CURLOPT_USERAGENT => $this->agents[array_rand($this->agents, 1)],
+            CURLOPT_HTTPHEADER => $this->headers,
+            CURLOPT_COOKIEJAR => 'cookies.txt',
+            CURLOPT_COOKIEFILE => 'cookies.txt'
         ];
+
 
         $curly = [];
         $mh = curl_multi_init();

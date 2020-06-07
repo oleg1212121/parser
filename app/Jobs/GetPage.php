@@ -36,6 +36,19 @@ class GetPage implements ShouldQueue
     protected $proxies = [];
 
     /**
+     * Заголовки запросов
+     * @var array
+     */
+    protected $headers = [
+        'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Accept-Language: ru-RU,ru-BY;q=0.9,ru;q=0.8,en-US;q=0.7,en;q=0.6',
+        'Content-Type: text/html; charset=utf-8',
+        'Cache-Control: no-cache',
+        'Connection: keep-alive',
+        'Referer: https://www.google.com/',
+    ];
+
+    /**
      * Массив user-agent
      * @var array
      */
@@ -192,23 +205,31 @@ class GetPage implements ShouldQueue
      */
     protected function sendingRequests()
     {
+
+        $options = [
+            CURLOPT_HEADER => 0,
+            CURLOPT_TIMEOUT => 50,
+            CURLOPT_FOLLOWLOCATION => 1,
+            CURLOPT_RETURNTRANSFER => 1,
+            CURLOPT_SSL_VERIFYPEER => 0,
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_CONNECTTIMEOUT => 6,
+            CURLOPT_USERAGENT => $this->agents[array_rand($this->agents, 1)],
+            CURLOPT_HTTPHEADER => $this->headers,
+            CURLOPT_COOKIEJAR => 'cookies.txt',
+            CURLOPT_COOKIEFILE => 'cookies.txt'
+        ];
+
         $curly = [];
         $mh = curl_multi_init();
 
         foreach ($this->links as $id => $url) {
             $curly[$id] = curl_init();
+            curl_setopt_array($curly[$id], $options);
             curl_setopt($curly[$id], CURLOPT_PROXY, $this->proxies[$id]->proxy); // ip прокси (имя:пароль@124.11.22.32:1028 / 124.65.12.55:8080)
             curl_setopt($curly[$id], CURLOPT_PROXYTYPE, constant($this->proxies[$id]->type ?? 'CURLPROXY_HTTP')); // type прокси socks5/4 , http , https
             curl_setopt($curly[$id], CURLOPT_URL, $url->link);
-            curl_setopt($curly[$id], CURLOPT_HEADER, false);
-            curl_setopt($curly[$id], CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($curly[$id], CURLOPT_TIMEOUT, 40);
-            curl_setopt($curly[$id], CURLOPT_FOLLOWLOCATION, true);
-            curl_setopt($curly[$id], CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($curly[$id], CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($curly[$id], CURLOPT_USERAGENT, $this->agents[array_rand($this->agents, 1)]);
-            curl_setopt($curly[$id], CURLOPT_CONNECTTIMEOUT, 6); // время установки соединения
-            curl_setopt($curly[$id], CURLOPT_NOBODY, false); // не показывать тело ответа
+
             curl_multi_add_handle($mh, $curly[$id]);
         }
 
