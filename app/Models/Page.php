@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Page extends Model
 {
-    protected $fillable = ['content', 'link_id','type', 'is_done'];
+    protected $fillable = ['content', 'link_id','type', 'is_done', 'order_id'];
     protected $table = 'pages';
 
     /**
@@ -51,6 +51,15 @@ class Page extends Model
     public function scopeProductPagesReadyToProcess($query)
     {
         return $query->notDone()->whereType(self::$PRODUCT_TYPE_SPECIFICATION);
+    }
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeProductDescriptionsReadyToProcess($query)
+    {
+        return $query->notDone()->whereType(self::$PRODUCT_TYPE_DESCRIPTION);
     }
 
     /**

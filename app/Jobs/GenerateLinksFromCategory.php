@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Link;
+use App\Models\Order;
 use App\Models\Page;
 use App\Services\ParserService;
 use Illuminate\Bus\Queueable;
@@ -15,11 +16,12 @@ class GenerateLinksFromCategory implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $page;
+    protected $page = null;
 
     /**
      * Create a new job instance.
      *
+     * @param Order $order
      * @param Page $page
      * @return void
      */
@@ -38,9 +40,6 @@ class GenerateLinksFromCategory implements ShouldQueue
         if($this->page){
             $parser = (new ParserService($this->page))->parsingLinks();
             \DB::transaction(function() use ($parser) {
-                if($parser->outputNextLink){
-                    Link::create(['link' => $parser->outputNextLink]);
-                }
                 if($parser->outputLinks){
                     foreach ($parser->outputLinks as $outputLink) {
                         Link::create($outputLink);

@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Image;
+use App\Models\Order;
 use App\Models\Page;
 use App\Models\Product;
 use App\Services\ParserService;
@@ -17,15 +18,17 @@ class ParsingProductContent implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $page = null;
+    protected $order = null;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Page $page = null)
+    public function __construct(Page $page = null, Order $order = null)
     {
         $this->page = $page;
+        $this->order = $order;
     }
 
     /**
@@ -35,10 +38,10 @@ class ParsingProductContent implements ShouldQueue
      */
     public function handle()
     {
-        if ($this->page) {
+        if ($this->page && $this->order) {
             $productData = (new ParserService($this->page))->parsingProductData();
             \DB::transaction(function () use ($productData) {
-                Product::firstOrCreate(
+                $product = Product::firstOrCreate(
                     [
                         'market_id' =>  $productData->product['market_id']
                     ],
@@ -46,9 +49,11 @@ class ParsingProductContent implements ShouldQueue
                         'title' =>  $productData->product['title'],
                         'content' =>  $productData->product['content'],
                         'link' =>  $productData->product['link'],
-                        'image' => 'gg'
                     ]
                 );
+
+                $this->order->products()->syncWithoutDetaching($product->id);
+
                 $productData->setCurrentPageIsDone();
             });
         }

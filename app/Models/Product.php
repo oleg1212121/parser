@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    protected $fillable = ['title', 'link', 'image', 'market_id', 'content'];
+    protected $fillable = ['title', 'link', 'market_id', 'content'];
     protected $table = 'products';
 
     public function images()
@@ -16,5 +16,9 @@ class Product extends Model
     public function links()
     {
         return $this->belongsTo(Link::class, 'link');
+    }
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class);
     }
 }

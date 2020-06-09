@@ -38,19 +38,24 @@ class ParsingProductImagesLinks implements ShouldQueue
         if($this->page){
             $productData = (new ParserService($this->page))->parsingProductImagesLinks();
             $images = $productData->images;
-            $ids = [];
-            foreach ($images as $item) {
-                $image = Image::firstOrCreate([
-                    'name' => $item['name']
-                ], [
-                    'link' => $item['link']
-                ]);
-                array_push($ids, $image->id);
-            }
-            if($product = Product::where('market_id', $productData->productMarketId)->first()){
-                $product->images()->sync($ids);
-                $productData->setCurrentPageIsDone();
-            }
+            $product = Product::where('market_id', $productData->productMarketId)->first();
+
+            \DB::transaction(function () use ($images, $product, $productData){
+                $ids = [];
+                foreach ($images as $item) {
+                    $image = Image::firstOrCreate([
+                        'name' => $item['name']
+                    ], [
+                        'link' => $item['link'],
+                        'extention' => $item['extention']
+                    ]);
+                    array_push($ids, $image->id);
+                }
+                if($product){
+                    $product->images()->sync($ids);
+                    $productData->setCurrentPageIsDone();
+                }
+            });
         }
     }
 }

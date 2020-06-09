@@ -176,8 +176,6 @@ class GetImage implements ShouldQueue
             CURLOPT_CONNECTTIMEOUT => 6,
             CURLOPT_USERAGENT => $this->agents[array_rand($this->agents, 1)],
             CURLOPT_HTTPHEADER => $this->headers,
-            CURLOPT_COOKIEJAR => 'cookies.txt',
-            CURLOPT_COOKIEFILE => 'cookies.txt'
         ];
 
 
@@ -190,6 +188,9 @@ class GetImage implements ShouldQueue
             curl_setopt($curly[$id], CURLOPT_PROXY, $this->proxies[$id]->proxy); // ip прокси (имя:пароль@124.11.22.32:1028 / 124.65.12.55:8080)
             curl_setopt($curly[$id], CURLOPT_PROXYTYPE, constant($this->proxies[$id]->type ?? 'CURLPROXY_HTTP')); // type прокси socks5/4 , http , https
             curl_setopt($curly[$id], CURLOPT_URL, $url->link);
+            curl_setopt($curly[$id], CURLOPT_COOKIEJAR, storage_path().'/app/cookies/'.md5($this->proxies[$id]->proxy).'.txt');
+            curl_setopt($curly[$id], CURLOPT_COOKIEFILE, storage_path().'/app/cookies/'.md5($this->proxies[$id]->proxy).'.txt');
+
             curl_multi_add_handle($mh, $curly[$id]);
         }
 
@@ -218,10 +219,9 @@ class GetImage implements ShouldQueue
                     unset($this->links[$id]);
                 } else {
                     $image = getimagesizefromstring($content);
-                    $extension = image_type_to_extension($image[2]);
-                    $format = str_replace('jpeg', 'jpg', $extension);
+                    $extention = image_type_to_extension($image[2]);
                     $image_sv = storage_path() . '/app/public/images/' . md5($this->links[$id]);
-                    if (!file_put_contents($image_sv . $format, $content)) {
+                    if (!file_put_contents($image_sv . $extention, $content)) {
                         unset($this->links[$id]);
                     }
                     unset($this->proxies[$id]);

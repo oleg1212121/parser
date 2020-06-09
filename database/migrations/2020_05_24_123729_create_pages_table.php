@@ -19,6 +19,7 @@ class CreatePagesTable extends Migration
             $table->unsignedTinyInteger('type')->default(0)->comment('Тип страницы');
             $table->boolean('is_done')->default(0)->comment('Отметка об обработке текущей страницы');
             $table->unsignedBigInteger('link_id')->nullable(true)->comment('Ключ к ссылке');
+            $table->unsignedBigInteger('order_id')->comment('Ключ к заказу');
             $table->timestamps();
         });
     }

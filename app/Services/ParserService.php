@@ -8,6 +8,7 @@
 
 namespace App\Services;
 
+use App\Models\Link;
 use App\Models\Page;
 
 class ParserService
@@ -24,11 +25,11 @@ class ParserService
      */
     public $outputLinks = [];
 
-    /**
-     * Ссылка на следующую страницу категории (по пагинации)
-     * @var null
-     */
-    public $outputNextLink = null;
+//    /**
+//     * Ссылка на следующую страницу категории (по пагинации)
+//     * @var null
+//     */
+//    public $outputNextLink = null;
 
     /**
      * Массив данных для создания продукта в БД (парсится со страниц продукта)
@@ -47,6 +48,12 @@ class ParserService
      * @var Page
      */
     protected $page;
+
+    /**
+     * Ссылка текущей страницы
+     * @var Link
+     */
+    protected $link;
 
     /**
      * Url сайта
@@ -69,7 +76,8 @@ class ParserService
     public function __construct(Page $page)
     {
         $this->page = $page;
-        $this->domen = $this->getDomen($page->link->link);
+        $this->link = $page->link;
+        $this->domen = $this->getDomen($this->link->link);
     }
 
     /**
@@ -79,7 +87,7 @@ class ParserService
     public function parsingLinks()
     {
         $dom = \phpQuery::newDocument($this->page->content);
-        $this->outputNextLink = $this->searchingNextButton($dom);
+//        $this->outputNextLink = $this->searchingNextButton($dom);
         $this->outputLinks = $this->searchingCardItemLinks($dom);
         \phpQuery::unloadDocuments();
         return $this;
@@ -106,16 +114,21 @@ class ParserService
         return $this;
     }
 
-    /**
-     * Метод поиска ссылки на следующую страницу категории
-     * @param $dom
-     * @return null|string
-     */
-    protected function searchingNextButton($dom)
-    {
-        $link = $dom->find(".n-pager__button-next")->attr('href') ?? null;
-        return $link ? $this->domen . $link : null;
-    }
+//    /**
+//     * Метод поиска ссылки на следующую страницу категории
+//     * @param $dom
+//     * @return null|array
+//     */
+//    protected function searchingNextButton($dom)
+//    {
+//        $link = $dom->find(".n-pager__button-next")->attr('href') ?? null;
+//        return $link
+//            ? [
+//                'link' => $this->domen . $link,
+//                'order_id' => $this->link,
+//            ]
+//            : null;
+//    }
 
     /**
      * Метод поиска ссылок на товары со страницы категории
@@ -127,17 +140,35 @@ class ParserService
         $arr = [];
         $d = $dom->find('.i-bem.b-zone.b-spy-visible.b-spy-events h3 > a');
 
+        $nextCategoryLink = $dom->find(".n-pager__button-next")->attr('href') ?? null;
+        $now = now();
+        if($nextCategoryLink){
+            array_push($arr,
+            [
+                'link' => $this->domen . $nextCategoryLink,
+                'order_id' => $this->link->order_id,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+        }
+
         foreach ($d as $item) {
             $i = pq($item)->attr('href');
             $links = $this->buildProductLink($i);
             if(count($links) > 0){
                 array_push($arr, [
                     'link' => $links[0],
-                    'type' => 1,
+                    'order_id' => $this->link->order_id,
+                    'type' => Link::$PRODUCT_TYPE_SPECIFICATION,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]);
                 array_push($arr, [
                     'link' => $links[1],
-                    'type' => 2,
+                    'order_id' => $this->link->order_id,
+                    'type' => Link::$PRODUCT_TYPE_DESCRIPTION,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]);
             }
         }
@@ -217,8 +248,7 @@ class ParserService
             'market_id' => $id,
             'title' => $title,
             'content' => json_encode($content),
-            'link' => $this->page->link_id,
-            'image' => 'gg',
+            'link' => $this->link->link,
             'created_at' => $now,
             'updated_at' => $now,
         ];
@@ -243,10 +273,15 @@ class ParserService
         foreach ($divs as $div) {
             $i = pq($div);
             $url = $i->contents()->eq(0)->attr('content');
+            $extention = 'jpeg';
+            if(preg_match('/\.[A-z]*\/orig/', $url,$m)){
+                $extention = preg_replace('/\/orig/','', $m[0]);
+            };
             if($url){
                 array_push($images, [
                     'link' => $url,
                     'name' => md5($url),
+                    'extention' => $extention,
                 ]);
             }
         }

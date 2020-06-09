@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateImageProductTable extends Migration
+class CreateOrderProductTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,15 @@ class CreateImageProductTable extends Migration
      */
     public function up()
     {
-        Schema::create('image_product', function (Blueprint $table) {
+        Schema::create('order_product', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('product_id')->comment('Внешний ключ к продукту');
-            $table->unsignedBigInteger('image_id')->comment('Внешний ключ к изображению');
+            $table->unsignedBigInteger('order_id')->comment('Внешний ключ к заказу');
+            $table->unsignedBigInteger('product_id')->comment('Внешний ключ к товару');
+
+//            $table->timestamps();
+
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('CASCADE');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('CASCADE');
-            $table->foreign('image_id')->references('id')->on('images')->onDelete('CASCADE');
         });
     }
 
@@ -29,6 +32,6 @@ class CreateImageProductTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('image_product');
+        Schema::dropIfExists('order_product');
     }
 }

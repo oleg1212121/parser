@@ -15,7 +15,7 @@ class GetPage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 5;
+    public $tries = 2;
 
     /**
      * Набор ссылок для запросов
@@ -216,8 +216,6 @@ class GetPage implements ShouldQueue
             CURLOPT_CONNECTTIMEOUT => 6,
             CURLOPT_USERAGENT => $this->agents[array_rand($this->agents, 1)],
             CURLOPT_HTTPHEADER => $this->headers,
-            CURLOPT_COOKIEJAR => 'cookies.txt',
-            CURLOPT_COOKIEFILE => 'cookies.txt'
         ];
 
         $curly = [];
@@ -229,6 +227,8 @@ class GetPage implements ShouldQueue
             curl_setopt($curly[$id], CURLOPT_PROXY, $this->proxies[$id]->proxy); // ip прокси (имя:пароль@124.11.22.32:1028 / 124.65.12.55:8080)
             curl_setopt($curly[$id], CURLOPT_PROXYTYPE, constant($this->proxies[$id]->type ?? 'CURLPROXY_HTTP')); // type прокси socks5/4 , http , https
             curl_setopt($curly[$id], CURLOPT_URL, $url->link);
+            curl_setopt($curly[$id], CURLOPT_COOKIEJAR, storage_path().'/app/cookies/'.md5($this->proxies[$id]->proxy).'.txt');
+            curl_setopt($curly[$id], CURLOPT_COOKIEFILE, storage_path().'/app/cookies/'.md5($this->proxies[$id]->proxy).'.txt');
 
             curl_multi_add_handle($mh, $curly[$id]);
         }
@@ -255,6 +255,7 @@ class GetPage implements ShouldQueue
                 'content' => $content,
                 'type' => $this->links[$id]->type,
                 'link_id' => $this->links[$id]->id,
+                'order_id' => $this->links[$id]->order_id,
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);

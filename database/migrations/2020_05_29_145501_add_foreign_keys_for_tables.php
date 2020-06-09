@@ -14,7 +14,8 @@ class AddForeignKeysForTables extends Migration
     public function up()
     {
         Schema::table('pages', function (Blueprint $table) {
-            $table->foreign('link_id')->references('id')->on('links')->onDelete('set null');
+            $table->foreign('link_id')->references('id')->on('links')->onDelete('cascade');
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
         });
         Schema::table('links', function (Blueprint $table) {
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
@@ -33,8 +34,8 @@ class AddForeignKeysForTables extends Migration
             $table->dropColumn(['order_id']);
         });
         Schema::table('pages', function (Blueprint $table) {
-            $table->dropForeign(['link_id']);
-            $table->dropColumn(['link_id']);
+            $table->dropForeign(['link_id','order_id']);
+            $table->dropColumn(['link_id','order_id']);
         });
     }
 }
