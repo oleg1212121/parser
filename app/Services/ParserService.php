@@ -273,15 +273,10 @@ class ParserService
         foreach ($divs as $div) {
             $i = pq($div);
             $url = $i->contents()->eq(0)->attr('content');
-            $extention = 'jpeg';
-            if(preg_match('/\.[A-z]*\/orig/', $url,$m)){
-                $extention = preg_replace('/\/orig/','', $m[0]);
-            };
             if($url){
                 array_push($images, [
                     'link' => $url,
                     'name' => md5($url),
-                    'extention' => $extention,
                 ]);
             }
         }

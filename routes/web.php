@@ -11,8 +11,9 @@
 |
 */
 
-Route::resource('/', 'MainPageController', ['main'])->only(['index']);
+Route::resource('/orders', 'OrderController', ['orders']);
 Route::resource('/links', 'LinksController', ['links']);
-Route::get('/horizon', function (){
-    return redirect();
-});
+Route::get('/', 'MainPageController@index');
+//Route::get('/horizon', function (){
+//    return redirect();
+//});

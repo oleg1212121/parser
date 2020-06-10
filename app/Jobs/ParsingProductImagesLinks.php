@@ -47,7 +47,6 @@ class ParsingProductImagesLinks implements ShouldQueue
                         'name' => $item['name']
                     ], [
                         'link' => $item['link'],
-                        'extention' => $item['extention']
                     ]);
                     array_push($ids, $image->id);
                 }

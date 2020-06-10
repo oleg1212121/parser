@@ -17,7 +17,7 @@ class CreateImagesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name',32)->unique()->comment('Имя файла на диске. Генерируется из ссылки md5');
             $table->text('link', 500)->comment('Ссылка на изображение');
-            $table->string('extention')->comment('Расширение файла');
+            $table->string('extention')->default('.jpeg')->comment('Расширение файла');
             $table->boolean('is_done')->default(0)->comment('Отметка о завершении скачивания');
             $table->timestamps();
         });

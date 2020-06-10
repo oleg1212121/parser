@@ -157,7 +157,13 @@ class GetImage implements ShouldQueue
     {
         \DB::transaction(function (){
             if(count($this->links)){
-                Image::whereIn('name', $this->links->pluck('name'))->update(['is_done' => 1]);
+                foreach ($this->links as $link) {
+                    $link->update([
+                       'extention' => $link->extention,
+                       'is_done' => 1
+                    ]);
+                }
+//                Image::whereIn('name', $this->links->pluck('name'))->update(['is_done' => 1]);
             }
             if (count($this->proxies) > 0) {
                 Proxy::whereIn('id', $this->proxies->pluck('id'))->increment('fails');
@@ -188,8 +194,8 @@ class GetImage implements ShouldQueue
             curl_setopt($curly[$id], CURLOPT_PROXY, $this->proxies[$id]->proxy); // ip прокси (имя:пароль@124.11.22.32:1028 / 124.65.12.55:8080)
             curl_setopt($curly[$id], CURLOPT_PROXYTYPE, constant($this->proxies[$id]->type ?? 'CURLPROXY_HTTP')); // type прокси socks5/4 , http , https
             curl_setopt($curly[$id], CURLOPT_URL, $url->link);
-            curl_setopt($curly[$id], CURLOPT_COOKIEJAR, storage_path().'/app/cookies/'.md5($this->proxies[$id]->proxy).'.txt');
-            curl_setopt($curly[$id], CURLOPT_COOKIEFILE, storage_path().'/app/cookies/'.md5($this->proxies[$id]->proxy).'.txt');
+            curl_setopt($curly[$id], CURLOPT_COOKIEJAR, storage_path().'/app/cookies/'.($this->proxies[$id]->id).'.txt');
+            curl_setopt($curly[$id], CURLOPT_COOKIEFILE, storage_path().'/app/cookies/'.($this->proxies[$id]->id).'.txt');
 
             curl_multi_add_handle($mh, $curly[$id]);
         }
@@ -223,6 +229,8 @@ class GetImage implements ShouldQueue
                     $image_sv = storage_path() . '/app/public/images/' . md5($this->links[$id]);
                     if (!file_put_contents($image_sv . $extention, $content)) {
                         unset($this->links[$id]);
+                    }else{
+                        $this->links[$id]->extention = $extention;
                     }
                     unset($this->proxies[$id]);
                 }

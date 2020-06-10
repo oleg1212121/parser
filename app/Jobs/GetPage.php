@@ -227,8 +227,8 @@ class GetPage implements ShouldQueue
             curl_setopt($curly[$id], CURLOPT_PROXY, $this->proxies[$id]->proxy); // ip прокси (имя:пароль@124.11.22.32:1028 / 124.65.12.55:8080)
             curl_setopt($curly[$id], CURLOPT_PROXYTYPE, constant($this->proxies[$id]->type ?? 'CURLPROXY_HTTP')); // type прокси socks5/4 , http , https
             curl_setopt($curly[$id], CURLOPT_URL, $url->link);
-            curl_setopt($curly[$id], CURLOPT_COOKIEJAR, storage_path().'/app/cookies/'.md5($this->proxies[$id]->proxy).'.txt');
-            curl_setopt($curly[$id], CURLOPT_COOKIEFILE, storage_path().'/app/cookies/'.md5($this->proxies[$id]->proxy).'.txt');
+            curl_setopt($curly[$id], CURLOPT_COOKIEJAR, storage_path().'/app/cookies/'.($this->proxies[$id]->id).'.txt');
+            curl_setopt($curly[$id], CURLOPT_COOKIEFILE, storage_path().'/app/cookies/'.($this->proxies[$id]->id).'.txt');
 
             curl_multi_add_handle($mh, $curly[$id]);
         }
