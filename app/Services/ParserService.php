@@ -10,6 +10,7 @@ namespace App\Services;
 
 use App\Models\Link;
 use App\Models\Page;
+use PHPHtmlParser\Dom;
 
 class ParserService
 {
@@ -86,10 +87,9 @@ class ParserService
      */
     public function parsingLinks()
     {
-        $dom = \phpQuery::newDocument($this->page->content);
-//        $this->outputNextLink = $this->searchingNextButton($dom);
+        $dom = new Dom();
+        $dom->load($this->page->content, ['cleanupInput' => false]);
         $this->outputLinks = $this->searchingCardItemLinks($dom);
-        \phpQuery::unloadDocuments();
         return $this;
     }
 
@@ -99,63 +99,50 @@ class ParserService
      */
     public function parsingProductData()
     {
-        $dom = \phpQuery::newDocument($this->page->content);
+        $dom = new Dom();
+        $dom->load($this->page->content, ['cleanupInput' => false]);
         $this->product = $this->searchingProductContent($dom);
-        \phpQuery::unloadDocuments();
         return $this;
     }
 
     public function parsingProductImagesLinks()
     {
-        $dom = \phpQuery::newDocument($this->page->content);
+        $dom = new Dom();
+        $dom->load($this->page->content, ['cleanupInput' => false]);
         $this->images = $this->searchingProductImages($dom);
         $this->productMarketId = $this->getProductId();
-        \phpQuery::unloadDocuments();
         return $this;
     }
 
-//    /**
-//     * Метод поиска ссылки на следующую страницу категории
-//     * @param $dom
-//     * @return null|array
-//     */
-//    protected function searchingNextButton($dom)
-//    {
-//        $link = $dom->find(".n-pager__button-next")->attr('href') ?? null;
-//        return $link
-//            ? [
-//                'link' => $this->domen . $link,
-//                'order_id' => $this->link,
-//            ]
-//            : null;
-//    }
 
     /**
      * Метод поиска ссылок на товары со страницы категории
      * @param $dom
      * @return array
      */
-    protected function searchingCardItemLinks($dom) :array
+    protected function searchingCardItemLinks($dom): array
     {
         $arr = [];
-        $d = $dom->find('.i-bem.b-zone.b-spy-visible.b-spy-events h3 > a');
-
-        $nextCategoryLink = $dom->find(".n-pager__button-next")->attr('href') ?? null;
-        $now = now();
-        if($nextCategoryLink){
+        $d = $dom->find('.layout h3 > a');
+        $nextCategoryLink = $dom->find(".n-pager__button-next", 0);
+        $now = now()->format('Y-m-d H:i:s');
+        if ($nextCategoryLink) {
+            $nextCategoryLink = $nextCategoryLink->getAttribute('href');
             array_push($arr,
-            [
-                'link' => $this->domen . $nextCategoryLink,
-                'order_id' => $this->link->order_id,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ]);
+                [
+                    'link' => $this->domen . $nextCategoryLink,
+                    'order_id' => $this->link->order_id,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ]);
         }
 
         foreach ($d as $item) {
-            $i = pq($item)->attr('href');
+            $i = $item->getAttribute('href');
+
             $links = $this->buildProductLink($i);
-            if(count($links) > 0){
+
+            if (count($links) > 0) {
                 array_push($arr, [
                     'link' => $links[0],
                     'order_id' => $this->link->order_id,
@@ -172,7 +159,6 @@ class ParserService
                 ]);
             }
         }
-
         return $arr;
     }
 
@@ -183,9 +169,9 @@ class ParserService
      */
     public function getDomen($url)
     {
-        if(preg_match('/^https?:\/\/[^\/]*(\/|$)/m', $url, $matches)){
+        if (preg_match('/^https?:\/\/[^\/]*(\/|$)/m', $url, $matches)) {
             $res = $matches[0];
-        }else{
+        } else {
             $res = null;
         }
         return $res;
@@ -197,12 +183,12 @@ class ParserService
      * @param $url
      * @return array
      */
-    protected function buildProductLink($url) :array
+    protected function buildProductLink($url): array
     {
-        $i = preg_replace('/\?.*/', '', $url);
+        $i = preg_replace(['/^\//', '/\?.*/'], '', $url);
         $redirect = preg_match('/\/redir\//', $i);
         return ($i && !$redirect)
-            ? [$this->domen . $i . $this->endForSpecification, $this->domen . $i . $this->endForDescription ]
+            ? [$this->domen . $i . $this->endForSpecification, $this->domen . $i . $this->endForDescription]
             : [];
     }
 
@@ -221,39 +207,49 @@ class ParserService
      * @param $dom
      * @return array
      */
-    protected function searchingProductContent($dom) :array
+    protected function searchingProductContent($dom): array
     {
-        $now = now();
+        $now = now()->format('Y-m-d H:i:s');
         $content = [];
+        $product = [];
+        $id = null;
+        $title = null;
 
+        $a = $dom->find('._3nG1s9PJnI', 0);
 
-        $a = $dom->find('._27nuSZ19h7');
-        $href = $a->attr('href');
-        $id = preg_replace(['/\/.*\//', '/(\?|\/).*/'], '', $href);
-        $title = $a->find("h1")->text();
-        $spec = $dom->find("dl");
+        if ($a) {
+            $href = $a->firstChild()->getAttribute('href');
+            $id = preg_replace(['/\/.*\//', '/(\?|\/).*/'], '', $href);
+            $title = $a->find("h1", 0);
+            $title = $title ? $title->text : null;
+            $spec = $dom->find("dl");
 
-        foreach ($spec as $item) {
-            $i = pq($item);
+            foreach ($spec as $item) {
+                $attr = $item->find('dt div span', 0);
+                $value = $item->find('dd', 0);
 
-            $attr = $i->find('dt div span')->text();
+                if ($attr && $value) {
+                    $k = $attr->text;
+                    $v = $value->text;
+                    if ($k && $v) {
+                        $content[$k] = $v;
+                    }
+                }
+            }
 
-            $value = $i->find('dd')->text();
-            if($attr && $value){
-                $content[$attr] = $value;
+            if(count($content) > 0 && $id && $title){
+                $product = [
+                    'market_id' => $id,
+                    'title' => $title,
+                    'content' => json_encode($content),
+                    'link' => $this->link->link,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
             }
         }
 
-        $arr = [
-            'market_id' => $id,
-            'title' => $title,
-            'content' => json_encode($content),
-            'link' => $this->link->link,
-            'created_at' => $now,
-            'updated_at' => $now,
-        ];
-
-        return $arr;
+        return $product;
     }
 
     /**
@@ -261,19 +257,18 @@ class ParserService
      */
     public function getProductId()
     {
-        $link = $this->page->link()->first()->link ?? null;
+        $link = $this->link->link ?? null;
 
         return preg_replace(['/.*\/.*\//', '/(\?|\/).*/'], '', $link);
     }
 
-    protected function searchingProductImages($dom) :array
+    protected function searchingProductImages($dom): array
     {
         $images = [];
         $divs = $dom->find('#ProductImageGallery > div');
         foreach ($divs as $div) {
-            $i = pq($div);
-            $url = $i->contents()->eq(0)->attr('content');
-            if($url){
+            $meta = $div->find('meta', 0);
+            if ($meta && $url = $meta->getAttribute('content')) {
                 array_push($images, [
                     'link' => $url,
                     'name' => md5($url),

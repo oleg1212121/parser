@@ -50,69 +50,71 @@ class OrderProcessingService
 
     public function processing()
     {
-        $chunkSize = 10;
+        if($this->order) {
+            $chunkSize = 20;
 
 
-        $first = in_array('categoryLink', $this->queues);
-        $second = in_array('categoryPage', $this->queues);
-        $third = in_array('productLink', $this->queues);
-        $fourth = in_array('productPage', $this->queues);
-        $fifth = in_array('image', $this->queues);
+            $first = in_array('categoryLink', $this->queues);
+            $second = in_array('categoryPage', $this->queues);
+            $third = in_array('productLink', $this->queues);
+            $fourth = in_array('productPage', $this->queues);
+            $fifth = in_array('image', $this->queues);
 
-        $categoryLinks = collect(['test']);
-        $productLinks = collect(['test']);
-        $categoryPages = collect(['test']);
-        $productPages = collect(['test']);
+            $categoryLinks = collect(['test']);
+            $productLinks = collect(['test']);
+            $categoryPages = collect(['test']);
+            $productPages = collect(['test']);
 
-        if (!$first) {
-            $categoryLinks = Link::categoryLinksReadyToProcess()->limit(200)->get();
-            $chunks = $categoryLinks->chunk($chunkSize);
-            foreach ($chunks as $chunk) {
-                GetPage::dispatch($chunk->values())->onQueue('categoryLink');
-            }
-        }
-
-        if (!$second) {
-            $productLinks = Link::productLinksReadyToProcess()->limit(200)->get();
-            $chunks = $productLinks->chunk($chunkSize);
-            foreach ($chunks as $chunk) {
-                GetPage::dispatch($chunk->values())->onQueue('categoryPage');
-            }
-        }
-        if (!$third) {
-            $categoryPages = Page::categoryPagesReadyToProcess()->with('link')->limit(30)->get();
-            foreach ($categoryPages as $page) {
-                GenerateLinksFromCategory::dispatch($page)->onQueue('productLink');
-            }
-        }
-        if (!$fourth) {
-            $productPages = Page::productPagesReadyToProcess()->with('link')->limit(30)->get();
-            if (count($productPages) > 0) {
-                foreach ($productPages as $page) {
-                    ParsingProductContent::dispatch($page, $this->order)->onQueue('productPage');
+            if (!$first) {
+                $categoryLinks = Link::categoryLinksReadyToProcess()->forOrder($this->order->id)->limit(200)->get();
+                $chunks = $categoryLinks->chunk($chunkSize);
+                foreach ($chunks as $chunk) {
+                    GetPage::dispatch($chunk->values())->onQueue('categoryLink');
                 }
-            } else {
-                if (count($categoryLinks) == 0 && count($productLinks) == 0 && count($categoryPages) == 0) {
-                    $productPages = Page::productDescriptionsReadyToProcess()->with('link')->limit(50)->get();
+            }
+
+            if (!$second) {
+                $productLinks = Link::productLinksReadyToProcess()->forOrder($this->order->id)->limit(200)->get();
+                $chunks = $productLinks->chunk($chunkSize);
+                foreach ($chunks as $chunk) {
+                    GetPage::dispatch($chunk->values())->onQueue('categoryPage');
+                }
+            }
+            if (!$third) {
+                $categoryPages = Page::categoryPagesReadyToProcess()->forOrder($this->order->id)->with('link')->limit(30)->get();
+                foreach ($categoryPages as $page) {
+                    GenerateLinksFromCategory::dispatch($page)->onQueue('productLink');
+                }
+            }
+            if (!$fourth) {
+                $productPages = Page::productPagesReadyToProcess()->forOrder($this->order->id)->with('link')->limit(30)->get();
+                if (count($productPages) > 0) {
                     foreach ($productPages as $page) {
-                        ParsingProductImagesLinks::dispatch($page)->onQueue('productPage');
+                        ParsingProductContent::dispatch($page, $this->order)->onQueue('productPage');
+                    }
+                } else {
+                    if (count($categoryLinks) == 0 && count($productLinks) == 0 && count($categoryPages) == 0) {
+                        $productPages = Page::productDescriptionsReadyToProcess()->forOrder($this->order->id)->with('link')->limit(50)->get();
+                        foreach ($productPages as $page) {
+                            ParsingProductImagesLinks::dispatch($page)->onQueue('productPage');
+                        }
                     }
                 }
             }
-        }
-        if (!$fifth && count($categoryLinks) == 0 && count($productLinks) == 0 && count($categoryPages) == 0 && count($productPages) == 0) {
-           if(in_array('images', $this->settings)){
-               $images = Image::notDone()->limit(60)->get();
-               $chunks = $images->chunk($chunkSize);
-               foreach ($chunks as $chunk) {
-                   GetImage::dispatch($chunk->values())->onQueue('image');
-               }
-               if(count($images) == 0){
-                   $this->order->update(['is_done' => 1]);
-               }
-           }else{
-               $this->order->update(['is_done' => 1]);
-           }
+            if (!$fifth && count($categoryLinks) == 0 && count($productLinks) == 0 && count($categoryPages) == 0 && count($productPages) == 0) {
+                if (in_array('images', $this->settings)) {
+                    $images = Image::notDone()->limit(200)->get();
+                    $chunks = $images->chunk($chunkSize);
+                    foreach ($chunks as $chunk) {
+                        GetImage::dispatch($chunk->values())->onQueue('image');
+                    }
+                    if (count($images) == 0) {
+                        $this->order->update(['is_done' => 1]);
+                    }
+                } else {
+                    $this->order->update(['is_done' => 1]);
+                }
+            }
         }
     }
 }

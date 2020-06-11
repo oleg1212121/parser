@@ -247,7 +247,7 @@ class GetPage implements ShouldQueue
                 $status = curl_multi_exec($mh, $running);
             } while ($mh == CURLM_CALL_MULTI_PERFORM);
         }
-        $now = now();
+        $now = now()->format('Y-m-d H:i:s');
         foreach ($curly as $id => $c) {
             $content = curl_multi_getcontent($c);
 
@@ -272,6 +272,7 @@ class GetPage implements ShouldQueue
                 unset($this->proxies[$key]);
             }
         }
+        echo 'Успешно - '.count($this->links).PHP_EOL;
     }
 
 }

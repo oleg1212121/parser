@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\File;
 
 class GetImage implements ShouldQueue
 {
@@ -226,7 +227,11 @@ class GetImage implements ShouldQueue
                 } else {
                     $image = getimagesizefromstring($content);
                     $extention = image_type_to_extension($image[2]);
-                    $image_sv = storage_path() . '/app/public/images/' . md5($this->links[$id]);
+                    $folderPath = storage_path() . '/app/public/images/';
+                    if(!file_exists($folderPath)){
+                        File::makeDirectory($folderPath, $mode = 0777, true, true);
+                    }
+                    $image_sv = $folderPath . $this->links[$id]->name;
                     if (!file_put_contents($image_sv . $extention, $content)) {
                         unset($this->links[$id]);
                     }else{
@@ -235,11 +240,12 @@ class GetImage implements ShouldQueue
                     unset($this->proxies[$id]);
                 }
             } else {
-                echo $this->links[$id]->link.PHP_EOL;
+
                 unset($this->links[$id]);
             }
             curl_multi_remove_handle($mh, $c);
         }
+        echo 'Обработано - '.count($this->links).PHP_EOL;
         curl_multi_close($mh);
     }
 }

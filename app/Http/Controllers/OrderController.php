@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Image;
 use App\Models\Link;
 use App\Models\Order;
+use App\Models\Page;
+use App\Models\Proxy;
 use App\Models\Setting;
+use App\Services\OrderProcessingService;
+use App\Services\ParserService;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -89,7 +94,7 @@ class OrderController extends Controller
      */
     public function update(Request $request, Order $order)
     {
-        $order->update(['published_at' => now()]);
+        $order->update(['published_at' => now()->format('Y-m-d H:i:s')]);
         return view('orders.orders_show', compact('order'));
     }
 

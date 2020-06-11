@@ -13,6 +13,7 @@
 
 Route::resource('/orders', 'OrderController', ['orders']);
 Route::resource('/links', 'LinksController', ['links']);
+Route::resource('/products', 'ProductController', ['products']);
 Route::get('/', 'MainPageController@index');
 //Route::get('/horizon', function (){
 //    return redirect();

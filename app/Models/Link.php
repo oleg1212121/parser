@@ -62,4 +62,14 @@ class Link extends Model
     {
         return $query->where('is_done',0);
     }
+
+    /**
+     * @param $query
+     * @param $id
+     * @return mixed
+     */
+    public function scopeForOrder($query, $id)
+    {
+        return $query->where('order_id', $id);
+    }
 }

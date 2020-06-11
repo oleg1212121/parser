@@ -17,7 +17,7 @@ class ProxiesSeeder extends Seeder
             $data = explode(PHP_EOL, $data);
             foreach ($data as $k => $item) {
                 $i = explode('+++',$item);
-                $date = now();
+                $date = now()->format('Y-m-d H:i:s');
                 if(count($i) > 1){
                     array_push($proxies, [
                         'proxy' => $i[0],
