@@ -19,6 +19,7 @@ class ParsingProductContent implements ShouldQueue
 
     protected $page = null;
     protected $order = null;
+    public $timeout = 120;
 
     /**
      * Create a new job instance.

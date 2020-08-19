@@ -5,16 +5,17 @@ namespace App\Jobs;
 use App\Models\Image;
 use App\Models\Page;
 use App\Models\Product;
-use App\Services\ParserService;
+use App\Services\ParserServicePlitka;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ParsingProductImagesLinks implements ShouldQueue
+class ParsingProductImagesLinksPlitka implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
 
     protected $page;
     public $timeout = 120;
@@ -37,7 +38,7 @@ class ParsingProductImagesLinks implements ShouldQueue
     public function handle()
     {
         if($this->page){
-            $productData = (new ParserService($this->page))->parsingProductImagesLinks();
+            $productData = (new ParserServicePlitka($this->page))->parsingProductImagesLinks();
             $images = $productData->images;
             $product = Product::where('market_id', $productData->productMarketId)->first();
 

@@ -3,16 +3,15 @@
 namespace App\Jobs;
 
 use App\Models\Link;
-use App\Models\Order;
 use App\Models\Page;
-use App\Services\ParserService;
+use App\Services\ParserServicePlitka;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class GenerateLinksFromCategory implements ShouldQueue
+class GenerateLinksFromCategoryPlitka implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -39,12 +38,13 @@ class GenerateLinksFromCategory implements ShouldQueue
     public function handle()
     {
         if($this->page){
-            $parser = (new ParserService($this->page))->parsingLinks();
+            $parser = (new ParserServicePlitka($this->page))->parsingLinks();
             \DB::transaction(function() use ($parser) {
                 if($parser->outputLinks){
-                    foreach ($parser->outputLinks as $outputLink) {
-                        Link::create($outputLink);
-                    }
+                    \DB::table('links')->insert($parser->outputLinks);
+//                    foreach ($parser->outputLinks as $outputLink) {
+//                        Link::create($outputLink);
+//                    }
                 }
                 $parser->setCurrentPageIsDone();
             });

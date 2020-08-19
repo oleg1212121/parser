@@ -39,6 +39,14 @@
                     <div class="invalid-feedback">Example invalid feedback text</div>
                 </div>
                 <h5>Ссылки</h5>
+                <div class="mb-3">
+                    <label for="validationText2">Количество страниц в категории</label>
+                    <input name="count" type="text" id="validationText2" class="form-control rounded-right" placeholder="Количество страниц в категории">
+                    <div class="invalid-feedback">
+                        Введите количество страниц в категории
+                    </div>
+                </div>
+
                 <div class="links">
                     <div class="mb-3 link">
                         <input name="links[]" type="text" class="form-control rounded-right" placeholder="Ссылка" required>

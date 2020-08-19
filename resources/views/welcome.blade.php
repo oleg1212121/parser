@@ -23,6 +23,7 @@
                     <a href="{{route('horizon.index')}}">Horizon page</a>
                 </div>
                 <div>
+                    {!! \App\Models\Page::find(143)->content !!}
                     @csrf
                     <table style="display: none;">
 

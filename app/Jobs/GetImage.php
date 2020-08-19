@@ -15,6 +15,8 @@ class GetImage implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $timeout = 120;
+
     protected $headers = [
             'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Language: ru-RU,ru-BY;q=0.9,ru;q=0.8,en-US;q=0.7,en;q=0.6',

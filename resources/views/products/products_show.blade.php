@@ -5,6 +5,9 @@
         <div class="row">
             <div class="col mb-5">
                 <h1>Товар</h1>
+                <a href="{{$product->link}}">
+                    <p>{{$product->title}}</p>
+                </a>
             </div>
         </div>
         <div class="row">

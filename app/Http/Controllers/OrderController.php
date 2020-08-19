@@ -35,38 +35,75 @@ class OrderController extends Controller
         return view('orders.orders_create');
     }
 
+//    /**
+//     * Store a newly created resource in storage.
+//     *
+//     * @param  \Illuminate\Http\Request  $request
+//     * @return \Illuminate\Http\Response
+//     */
+//    public function store(Request $request)
+//    {
+//        $data = $request->only(['name','description','document','links','settings']);
+//
+//        \DB::transaction(function () use ($data) {
+//            $order = Order::create([
+//                'name' => $data['name'],
+//                'description' => $data['description'],
+//            ]);
+//            if(isset($data['settings'])){
+//                $order->settings()->sync(Setting::first()->id);
+//            }
+//            foreach ($data['links'] as $link) {
+//                Link::create([
+//                    'link' => $link,
+//                    'order_id' => $order->id
+//                ]);
+//            }
+//        });
+//        return redirect()->route('orders.index');
+//    }
+
+
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $data = $request->only(['name','description','document','links','settings']);
-
+        $data = $request->only(['name', 'description', 'document', 'links', 'settings', 'count']);
+        $data['count'] = isset($data['count']) ? $data['count'] : 1;
         \DB::transaction(function () use ($data) {
             $order = Order::create([
                 'name' => $data['name'],
                 'description' => $data['description'],
             ]);
-            if(isset($data['settings'])){
+            if (isset($data['settings'])) {
                 $order->settings()->sync(Setting::first()->id);
             }
-            foreach ($data['links'] as $link) {
-                Link::create([
-                    'link' => $link,
-                    'order_id' => $order->id
+
+            $arr = [];
+            $now = now();
+            for ($i = 1; $i <= $data['count']; $i++) {
+                array_push($arr, [
+                    'link' => $data['links'][0] . '?page=' . $i,
+                    'order_id' => $order->id,
+                    'created_at' => $now,
+                    'updated_at' => $now,
                 ]);
             }
+            \DB::table('links')->insert($arr);
+
         });
         return redirect()->route('orders.index');
     }
 
+
     /**
      * Display the specified resource.
      *
-     * @param  Order  $order
+     * @param  Order $order
      * @return \Illuminate\Http\Response
      */
     public function show(Order $order)
@@ -77,7 +114,7 @@ class OrderController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  Order  $order
+     * @param  Order $order
      * @return \Illuminate\Http\Response
      */
     public function edit(Order $order)
@@ -88,8 +125,8 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  order  $order
+     * @param  \Illuminate\Http\Request $request
+     * @param  order $order
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Order $order)
@@ -101,7 +138,7 @@ class OrderController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
